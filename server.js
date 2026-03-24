@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const serviceAccount = require("./shop_pos_firebase_key.json");
+const admin = require("./firebaseAdmin");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -12,7 +13,11 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  }),
+);
 app.use(express.json());
 
 /* =========================

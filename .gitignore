@@ -1,2 +1,3 @@
 node_modules
 shop_pos_firebase_key.json
+.env
