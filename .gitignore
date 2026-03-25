@@ -4,3 +4,4 @@ shop_pos_firebase_key.json
 .vercel
 .env*.local
 .vscode
+server.js
