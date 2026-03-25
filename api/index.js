@@ -1,4 +1,5 @@
 require("dotenv").config();
+const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
 const admin = require("../firebaseAdmin");
@@ -278,4 +279,4 @@ if (require.main === module) {
   app.listen(PORT, () => console.log(`Backend running`));
 }
 
-module.exports = app;
+module.exports = serverless(app);
