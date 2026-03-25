@@ -2,9 +2,9 @@ require("dotenv").config();
 const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
-const admin = require("./firebaseAdmin");
+// const admin = require("./firebaseAdmin");
 
-const db = admin.firestore();
+// const db = admin.firestore();
 const app = express();
 
 app.use(cors({ origin: "*" }));
