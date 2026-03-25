@@ -1,10 +1,9 @@
 require("dotenv").config();
-const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
-// const admin = require("./firebaseAdmin");
+const admin = require("./firebaseAdmin");
 
-// const db = admin.firestore();
+const db = admin.firestore();
 const app = express();
 
 app.use(cors({ origin: "*" }));
@@ -16,6 +15,7 @@ const PORT = process.env.PORT || 3000;
    ROOT API
 ========================= */
 app.get("/", (req, res) => {
+  console.log("Received request at /");
   res.send("POS API running");
 });
 
@@ -27,7 +27,6 @@ app.get("/health", (req, res) => {
    PRODUCTS APIs
 ========================= */
 
-// Add product
 app.post("/add-product", async (req, res) => {
   try {
     const product = req.body;
@@ -39,7 +38,6 @@ app.post("/add-product", async (req, res) => {
   }
 });
 
-// Get all products
 app.get("/products", async (req, res) => {
   try {
     const snapshot = await db.collection("products").get();
@@ -54,7 +52,6 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// Get product by barcode
 app.get("/products/barcode/:barcode", async (req, res) => {
   try {
     const barcode = req.params.barcode;
@@ -79,11 +76,9 @@ app.get("/products/barcode/:barcode", async (req, res) => {
   }
 });
 
-// Get products by category
 app.get("/products-by-category/:categoryId", async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-
     const snapshot = await db
       .collection("products")
       .where("category_id", "==", categoryId)
@@ -101,14 +96,11 @@ app.get("/products-by-category/:categoryId", async (req, res) => {
   }
 });
 
-// Update product
 app.put("/update-product/:id", async (req, res) => {
   try {
     const productId = req.params.id;
     const updatedData = req.body;
-
     await db.collection("products").doc(productId).update(updatedData);
-
     res.send({ message: "Product updated successfully" });
   } catch (error) {
     console.error(error);
@@ -116,13 +108,10 @@ app.put("/update-product/:id", async (req, res) => {
   }
 });
 
-// Delete product
 app.delete("/delete-product/:id", async (req, res) => {
   try {
     const productId = req.params.id;
-
     await db.collection("products").doc(productId).delete();
-
     res.send({ message: "Product deleted successfully" });
   } catch (error) {
     console.error(error);
@@ -134,12 +123,10 @@ app.delete("/delete-product/:id", async (req, res) => {
    CATEGORY APIs
 ========================= */
 
-// Add category
 app.post("/categories/add-category", async (req, res) => {
   try {
     const category = req.body;
     const docRef = await db.collection("categories").add(category);
-
     res.send({ message: "Category added successfully", id: docRef.id });
   } catch (error) {
     console.error(error);
@@ -147,16 +134,13 @@ app.post("/categories/add-category", async (req, res) => {
   }
 });
 
-// Get all categories
 app.get("/categories", async (req, res) => {
   try {
     const snapshot = await db.collection("categories").get();
-
     const categories = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
     res.send(categories);
   } catch (error) {
     console.error(error);
@@ -168,11 +152,9 @@ app.get("/categories", async (req, res) => {
    INVENTORY API
 ========================= */
 
-// Stock-in / Stock-out
 app.post("/stock-in", async (req, res) => {
   try {
     const { product_id, stock_quantity } = req.body;
-
     const productRef = db.collection("products").doc(product_id);
     const doc = await productRef.get();
 
@@ -181,7 +163,6 @@ app.post("/stock-in", async (req, res) => {
     }
 
     const currentStock = doc.data().stock_quantity || 0;
-
     await productRef.update({
       stock_quantity: currentStock + stock_quantity,
     });
@@ -197,7 +178,6 @@ app.post("/stock-in", async (req, res) => {
    SALES APIs
 ========================= */
 
-// ✅ IMPORTANT: Get ALL sales FIRST
 app.get("/sales", async (req, res) => {
   try {
     const snapshot = await db
@@ -217,11 +197,9 @@ app.get("/sales", async (req, res) => {
   }
 });
 
-// Get sale by ID
 app.get("/sales/:id", async (req, res) => {
   try {
     const id = req.params.id;
-
     const doc = await db.collection("sales").doc(id).get();
 
     if (!doc.exists) {
@@ -235,7 +213,6 @@ app.get("/sales/:id", async (req, res) => {
   }
 });
 
-// Create sale
 app.post("/create-sale", async (req, res) => {
   try {
     const { items, total_amount, payment_method } = req.body;
@@ -247,24 +224,19 @@ app.post("/create-sale", async (req, res) => {
       created_at: new Date(),
     });
 
-    // Reduce stock
     for (const item of items) {
       const productRef = db.collection("products").doc(item.product_id);
       const productDoc = await productRef.get();
 
       if (productDoc.exists) {
         const currentStock = productDoc.data().stock_quantity || 0;
-
         await productRef.update({
           stock_quantity: currentStock - item.quantity,
         });
       }
     }
 
-    res.send({
-      message: "Sale created successfully",
-      sale_id: saleRef.id,
-    });
+    res.send({ message: "Sale created successfully", sale_id: saleRef.id });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error creating sale");
@@ -276,7 +248,7 @@ app.post("/create-sale", async (req, res) => {
 ========================= */
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Backend running`));
+  app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
 }
 
-module.exports = serverless(app);
+module.exports = app;
