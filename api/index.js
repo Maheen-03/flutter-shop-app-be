@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const admin = require("./firebaseAdmin"); // <-- Firebase initialized here
+const admin = require("../firebaseAdmin"); // adjust if path differs
 
 const db = admin.firestore();
 const app = express();
@@ -211,9 +211,7 @@ app.post("/create-sale", async (req, res) => {
 });
 
 /* =========================
-   SERVER START
+   Vercel Export
 ========================= */
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+
+module.exports = app;
