@@ -18,6 +18,10 @@ app.get("/", (req, res) => {
   res.send("POS API running");
 });
 
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 /* =========================
    PRODUCTS APIs
 ========================= */

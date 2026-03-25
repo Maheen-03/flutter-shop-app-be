@@ -4,16 +4,19 @@
     "main": "api/index.js",
     "scripts": {
         "start": "node api/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "nodemon api/index.js",
+        "vercel-build": "echo \"No build step required\""
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "description": "",
+    "engines": {
+        "node": ">=18"
+    },
     "dependencies": {
         "cors": "^2.8.6",
+        "dotenv": "^16.3.1",
         "express": "^5.2.1",
-        "firebase-admin": "^13.7.0",
-        "dotenv": "^16.3.1"
+        "firebase-admin": "^13.7.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14"
     }
 }
